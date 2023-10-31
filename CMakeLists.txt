@@ -10,6 +10,7 @@ set(CMAKE_CXX_STANDARD 20)
 project(mixplus-pico)
 
 add_library(${PROJECT_NAME})
+add_compile_options(-Og -g)
 
 pico_generate_pio_header(${PROJECT_NAME} ${CMAKE_CURRENT_LIST_DIR}/src/spi_transmitonly.pio)
 

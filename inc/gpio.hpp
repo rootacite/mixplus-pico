@@ -17,6 +17,19 @@ private:
     uint pin;
 
 public:
+    static void setIRQCallback(gpio_irq_callback_t callback)
+    {
+        if(!callback)
+        {
+            irq_set_enabled(IO_IRQ_BANK0, false);
+            return;
+        }
+
+        gpio_set_irq_callback(callback);
+        irq_set_enabled(IO_IRQ_BANK0, true);
+    }
+
+public:
     explicit GPIO(uint pin, bool out, uint8_t pulls = MX_PULLS_NONE)
     {
         this->pin = pin;
@@ -44,6 +57,11 @@ public:
     void toggle() const
     {
         gpio_put(pin, !get());
+    }
+
+    void setEventEnable(uint32_t events, bool enabled) const
+    {
+        gpio_set_irq_enabled(pin, events, enabled);
     }
 };
 

@@ -29,7 +29,7 @@ struct ST7735Defines
 class ST7735
 {
 private:
-    SPITransmitonly* SPI = nullptr;
+    SPIMaster* SPI = nullptr;
     ProgrammableIO* PIO_SPI = nullptr;
 
     GPIO* pDC = nullptr;
@@ -169,10 +169,10 @@ public:
         pRST = new GPIO(Defs.rst, true);
 
 
-        SPI = new SPITransmitonly(
-                {nullptr, Defs.scl, Defs.sda, Defs.vrx, 0xFF }
+        SPI = new SPIMaster(
+                {spi1, Defs.scl, Defs.sda, Defs.vrx, 0xFF }, 8
                 );
-        SPI->init((float)1.0);
+        SPI->init(60000000);
 
         pDC->put(false);
         pCS->put(false);
@@ -264,7 +264,7 @@ public:
         pCS->put(false);
 
         write_block(frame_buffer, tft_width * tft_height * 2);
-        sleep_ms(5);
+        sleep_ms(2);
 
         pCS->put(true);
     }
@@ -348,6 +348,11 @@ public:
                 cursor_x = tft_width;
             }
         }
+    }
+
+    void* getBuffer()
+    {
+        return frame_buffer;
     }
 };
 

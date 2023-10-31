@@ -20,12 +20,12 @@ private:
     uint count = 0;
 public:
 
-    explicit DMA(volatile void* s = nullptr, volatile void* d = nullptr, uint cc = 0, dma_channel_transfer_size sz = DMA_SIZE_8)
+    explicit DMA(const volatile void* s = nullptr, volatile void* d = nullptr, uint cc = 0, dma_channel_transfer_size sz = DMA_SIZE_8)
     {
         dma_channel = dma_claim_unused_channel(true);
         c = dma_channel_get_default_config(dma_channel);
 
-        src = s;
+        src = (volatile void*)s;
         dst = d;
         count = cc;
 
