@@ -19,5 +19,5 @@ add_subdirectory(lib/FatFs_SPI fatfs)
 
 target_sources(${PROJECT_NAME} PUBLIC src/mixplus.cpp)
 
-target_link_libraries(${PROJECT_NAME} pico_stdlib hardware_dma hardware_spi hardware_pio hardware_adc FatFs_SPI)
+target_link_libraries(${PROJECT_NAME} pico_stdlib hardware_dma hardware_spi hardware_pio hardware_adc hardware_i2c FatFs_SPI)
 target_include_directories(${PROJECT_NAME} PUBLIC inc)

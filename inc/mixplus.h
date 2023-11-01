@@ -9,6 +9,7 @@
 #include "gpio.hpp"
 #include "pio.hpp"
 #include "adc.hpp"
+#include "iic.hpp"
 
 #include "st7735.hpp"
 

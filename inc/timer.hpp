@@ -18,6 +18,67 @@ public:
     virtual void setEnabled(bool enabled) = 0;
 };
 
+class AlarmTimer : public Timer
+{
+private:
+    uint time_format = MP_TIMER_IN_MS;
+    int32_t time_span = 1000;
+
+    alarm_callback_t cb = nullptr;
+    void* userData = nullptr;
+
+    alarm_id_t id = 0;
+public:
+
+    explicit AlarmTimer(int32_t tp, alarm_callback_t b, uint tf = MP_TIMER_IN_MS, void* ud = nullptr)
+    {
+        this->time_format = tf;
+        this->time_span = tp;
+        setCallback(b);
+        this->userData = ud;
+    }
+
+    void setFreq(int32_t tp, uint tf = MP_TIMER_IN_MS) override
+    {
+        this->time_format = tf;
+        this->time_span = tp;
+    }
+
+    void setCallback(alarm_callback_t b)
+    {
+        this->cb = b;
+    }
+
+    void setUserData(void* ud) override
+    {
+        this->userData = ud;
+    }
+
+    void setEnabled(bool enabled) override
+    {
+        if(!this->cb)return;
+
+        if(enabled)
+        {
+            switch(this->time_format)
+            {
+                case MP_TIMER_IN_MS:
+                    id = add_alarm_in_ms(this->time_span, this->cb, this->userData, false);
+                    break;
+                case MP_TIMER_IN_US:
+                    id = add_alarm_in_us(this->time_span, this->cb, this->userData, false);
+                    break;
+                default:
+                    break;
+            }
+        }
+        else
+        {
+            cancel_alarm(id);
+        }
+    }
+};
+
 
 class RepeatingTimer : public Timer
 { // inherit from timer
