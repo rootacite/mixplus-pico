@@ -68,6 +68,24 @@ public:
         adc_run(false);
         adc_fifo_drain();
     }
+
+    uint getDMAChannel()
+    {
+        return AD->getChannel();
+    }
+
+    void startConv(uint16_t* buffer, uint per_block)
+    {
+        adc_run(true);
+        AD->setDstBuffer(buffer);
+        AD->Begin(per_block);
+    }
+
+    void stopConv(uint16_t* buffer, uint per_block)
+    {
+        adc_run(false);
+        adc_fifo_drain();
+    }
 };
 
 #endif //PICO_BLINK_ADC_HPP
