@@ -152,7 +152,7 @@ bool my_spi_init(spi_t *spi_p) {
 
         // Default:
         if (!spi_p->baud_rate)
-            spi_p->baud_rate = 10 * 1000 * 1000;
+            spi_p->baud_rate = 60 * 1000 * 1000;
         // For the IRQ notification:
         sem_init(&spi_p->sem, 0, 1);
 
