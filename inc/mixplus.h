@@ -12,6 +12,7 @@
 #include "iic.hpp"
 
 #include "st7735.hpp"
+#include "mpu6050.hpp"
 
 #include "sd.hpp"
 

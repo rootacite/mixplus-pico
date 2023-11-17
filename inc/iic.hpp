@@ -45,6 +45,11 @@ private:
     }
 
 public:
+    explicit IICMaster(i2c_inst_t* iic, uint scl, uint sda, uint speed = 100000) : IIC(iic, scl, sda, speed)
+    {
+
+    }
+
     uint read_from(uint8_t* pData, uint cc) override
     {
         i2c_read_blocking(iic_dev, addr, pData, cc, false);
@@ -55,7 +60,7 @@ public:
         i2c_write_blocking(iic_dev, addr, pData, cc, false);
     }
 
-    void setSpeed(uint baud_rate) const
+    void setSpeed(uint baud_rate) override
     {
         i2c_set_baudrate(iic_dev, baud_rate);
     }

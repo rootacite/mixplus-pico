@@ -67,7 +67,8 @@ private:
 
     pio_sm_config c { 0 };
 
-    DMA* pioDMA = nullptr;
+    DMA* pioDMA_Tx = nullptr;
+    DMA* pioDMA_Rx = nullptr;
 public:
     explicit ProgrammableIO(
             PIO pio, const pio_program_t* pro, PinConfig Pins,
@@ -172,21 +173,45 @@ public:
         pio_sm_put_blocking(pio, sm, data);
     }
 
-    void initDMA(dma_channel_transfer_size manual_size)
+    void initTxDMA(dma_channel_transfer_size manual_size)
     {
-        pioDMA = new DMA(nullptr, &pio->txf[sm], 0, manual_size);
+        pioDMA_Tx = new DMA(nullptr, &pio->txf[sm], 0, manual_size);
 
-        pioDMA->setIncrement(true, true);
-        pioDMA->setIncrement(false, false);
-        pioDMA->setDataRequests(pio_get_dreq(pio, sm, true));
-        pioDMA->FlushConfigure();
+        pioDMA_Tx->setIncrement(true, true);
+        pioDMA_Tx->setIncrement(false, false);
+        pioDMA_Tx->setDataRequests(pio_get_dreq(pio, sm, true));
+        pioDMA_Tx->FlushConfigure();
     }
 
-    void putDMA(void* buf, uint cc)
+    void putDMA(void* buf, uint cc, bool block = true)
     {
-        pioDMA->setSrcBuffer(buf);
-        pioDMA->Begin(cc);
-        pioDMA->WaitForFinish();
+        pioDMA_Tx->setSrcBuffer(buf);
+        pioDMA_Tx->Begin(cc);
+        if(block)
+            pioDMA_Tx->WaitForFinish();
+    }
+
+    void get(uint32_t* data)
+    {
+        *data = pio_sm_get_blocking(pio, sm);
+    }
+
+    void initRxDMA(dma_channel_transfer_size manual_size)
+    {
+        pioDMA_Rx = new DMA(&pio->rxf[sm], nullptr, 0, manual_size);
+
+        pioDMA_Rx->setIncrement(true, false);
+        pioDMA_Rx->setIncrement(false, true);
+        pioDMA_Rx->setDataRequests(pio_get_dreq(pio, sm, false));
+        pioDMA_Rx->FlushConfigure();
+    }
+
+    void getDMA(void* buf, uint cc, bool block = true)
+    {
+        pioDMA_Rx->setDstBuffer(buf);
+        pioDMA_Rx->Begin(cc);
+        if(block)
+            pioDMA_Rx->WaitForFinish();
     }
 };
 
