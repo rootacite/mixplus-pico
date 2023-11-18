@@ -15,14 +15,14 @@
 
 struct ST7735Defines
 {
-    spi_inst_t* spi;
+    spi_inst_t* spi; // spi1
 
-    uint dc;
-    uint cs;
-    uint rst;
+    uint dc;  //10
+    uint cs;  //9
+    uint rst; //11
 
-    uint scl;
-    uint sda;
+    uint scl;  //14
+    uint sda;  //15
     uint vrx;
 };
 
