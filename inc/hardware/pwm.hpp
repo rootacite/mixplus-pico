@@ -47,6 +47,11 @@ public:
     {
         pwm_set_gpio_level(pin, level);
     }
+
+    void setDiv(float div) const
+    {
+        pwm_set_clkdiv(Defines.slice, div);
+    }
 };
 
 #endif //PICO_DEMO2_PWM_HPP

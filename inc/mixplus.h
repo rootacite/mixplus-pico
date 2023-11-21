@@ -31,6 +31,10 @@
 #include "devices/sd.hpp"
 #endif
 
+#ifdef MX_ENABLE_MACHINE
+#include "machine/servo.hpp"
+#endif
+
 #ifdef __cplusplus
 extern "C" {
 #endif /* __cplusplus */
