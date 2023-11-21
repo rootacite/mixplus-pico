@@ -7,9 +7,9 @@
 
 #include "st7735_defs.h"
 
-#include "spi.hpp"
-#include "dma.hpp"
-#include "pio.hpp"
+#include "hardware/spi.hpp"
+#include "hardware/dma.hpp"
+#include "hardware/pio.hpp"
 
 #define RGB565(r, g, b) (((r & 0xF8) << 8) | ((g & 0xFC) << 3) | (b >> 3))
 

@@ -6,28 +6,29 @@
 
 #ifdef MX_BASIC_HARDWARE
 
-#include "timer.hpp"
-#include "dma.hpp"
-#include "spi.hpp"
-#include "gpio.hpp"
-#include "pio.hpp"
-#include "adc.hpp"
-#include "iic.hpp"
-#include "pwm.hpp"
+#include "hardware/timer.hpp"
+#include "hardware/dma.hpp"
+#include "hardware/spi.hpp"
+#include "hardware/gpio.hpp"
+#include "hardware/pio.hpp"
+#include "hardware/adc.hpp"
+#include "hardware/iic.hpp"
+#include "hardware/pwm.hpp"
 #include "task.hpp"
 
 #endif
 
 #ifdef MX_ENABLE_ST7735
-#include "st7735.hpp"
+#include "devices/st7735.hpp"
 #endif
 
 #ifdef MX_ENABLE_MPU6050
-#include "mpu6050.hpp"
+#include "devices/mpu6050.hpp"
+#include "devices/gy273.hpp"
 #endif
 
 #ifdef MX_ENABLE_SD
-#include "sd.hpp"
+#include "devices/sd.hpp"
 #endif
 
 #ifdef __cplusplus

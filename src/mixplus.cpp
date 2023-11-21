@@ -1,5 +1,5 @@
 
-#include "../inc/mixplus.h"
+#include "mixplus.h"
 #include "pico/stdlib.h"
 
 #include <iostream>

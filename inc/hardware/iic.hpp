@@ -21,12 +21,15 @@ public:
     {
         this->iic_dev = iic;
 
-        i2c_init(iic, speed);
-
+        gpio_init(sda);
+        gpio_init(scl);
         gpio_set_function(sda, GPIO_FUNC_I2C);
         gpio_set_function(scl, GPIO_FUNC_I2C);
         gpio_pull_up(sda);
         gpio_pull_up(scl);
+
+        i2c_init(iic, speed);
+
     }
 
     virtual void write_to(uint8_t* pData, uint cc) = 0;
@@ -50,9 +53,26 @@ public:
 
     }
 
+    int i2c_read_reg(uint8_t reg, uint8_t *buf, size_t len, uint time_out = 0xFFFFFFFF)
+    {
+        i2c_write_timeout_us(iic_dev, addr, &reg, 1, true, time_out);
+        return i2c_read_timeout_us(iic_dev, addr, buf, len, false, time_out);
+    }
+
+    void i2c_write_reg(uint8_t reg, uint8_t *buf, size_t len, uint time_out = 0xFFFFFFFF)
+    {
+        auto* data = new uint8_t[len + 1];
+        data[0] = reg;
+        memcpy(&data[1], buf, len);
+
+        i2c_write_timeout_us(iic_dev, addr, data, len + 1, false, time_out);
+
+        delete[] data;
+    }
+
     uint read_from(uint8_t* pData, uint cc) override
     {
-        i2c_read_blocking(iic_dev, addr, pData, cc, false);
+        return i2c_read_blocking(iic_dev, addr, pData, cc, false);
     }
 
     void write_to(uint8_t* pData, uint cc) override
@@ -81,7 +101,7 @@ public:
             if (reserved_addr(addr))
                 ret = PICO_ERROR_GENERIC;
             else
-                ret = i2c_read_blocking(i2c_default, addr, &rxdata, 1, false);
+                ret = i2c_read_blocking(iic_dev, addr, &rxdata, 1, false);
 
             if(ret >= 0)
             {
