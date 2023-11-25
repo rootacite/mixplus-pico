@@ -32,11 +32,19 @@ struct TaskCycle
 
     CycleResult result;
 
-    int32_t sleep_time;        //Valid while result is sleep
-    condition_t condition;  //Vail while result is wait
+    int32_t sleep_time;        //Valid while result is wait
+    condition_t condition;  //Vail while result is condition
 
     void* data;
 };
+
+
+struct ThreadCommand
+{
+    bool roa; // remove or add
+    TaskCycle* data;
+};
+
 
 struct TaskDefines
 {
@@ -53,6 +61,26 @@ static void core1_task_f()
 {
     while(1)
     {
+        if(multicore_fifo_rvalid())
+        {
+            auto rd_command = (ThreadCommand*)multicore_fifo_pop_blocking();
+            if(rd_command->roa)
+            {
+                for(int i=0;i<core1_list->size();i++)
+                {
+                    if((*core1_list)[i].id == rd_command->data->id)
+                        core1_list->erase(core1_list->begin() + i);
+                }
+            }
+            else
+            {
+                core1_list->push_back(*rd_command->data);
+            }
+
+            delete rd_command->data;
+            delete rd_command;
+        }
+
         auto load_i = *core1_list;
         for(TaskCycle t : load_i)
         {
@@ -152,19 +180,28 @@ public:
     /// \return id
     uint addHandler(task_t handler)
     {
+        while (!multicore_fifo_wready()) sleep_ms(1);
+
         uint id = 0;
         for(id = 0; id < 65535 ; id++)
         {
             if(!isIdInTasks(id))break;
         }
 
-        Tasks->push_back({
-            .handler = handler,
-            .id = id,
-            .is_enable = true,
-            .condition = nullptr,
-            .data = nullptr
-        });
+        auto add_data = new TaskCycle{
+                .handler = handler,
+                .id = id,
+                .is_enable = true,
+                .condition = nullptr,
+                .data = nullptr
+        };
+
+        auto add_command = new ThreadCommand{
+                .roa = false,  // Add
+                .data = add_data
+        };
+
+        multicore_fifo_push_blocking((uint32_t)add_command);
 
         return id;
     }
@@ -172,8 +209,18 @@ public:
     void removeHandler(uint id)
     {
         if(!isIdInTasks(id)) return;
+        while (!multicore_fifo_wready()) sleep_ms(1);
 
-        Tasks->erase(Tasks->begin() + getIndex(id));
+        auto add_data = new TaskCycle{
+                .id = id      // id to remove
+        };
+
+        auto add_command = new ThreadCommand{
+                .roa = true,  // Remove
+                .data = add_data
+        };
+
+        multicore_fifo_push_blocking((uint32_t)add_command);
     }
 
     void start() const
@@ -181,6 +228,7 @@ public:
         if(Defines.core == 1)
         {
             ::core1_list = Tasks;
+            multicore_reset_core1();
             multicore_launch_core1(core1_task_f);
         }
     }
