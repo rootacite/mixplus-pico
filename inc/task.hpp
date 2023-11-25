@@ -178,7 +178,7 @@ public:
     ///
     /// \param handler the handler
     /// \return id
-    uint addHandler(task_t handler)
+    uint addHandler(task_t handler, void* data = nullptr)
     {
         while (!multicore_fifo_wready()) sleep_ms(1);
 
@@ -193,7 +193,7 @@ public:
                 .id = id,
                 .is_enable = true,
                 .condition = nullptr,
-                .data = nullptr
+                .data = data
         };
 
         auto add_command = new ThreadCommand{
